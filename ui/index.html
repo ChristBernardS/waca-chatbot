@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waca — UKDW's Personal Chatbot</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/ui/styles.css?v=2" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── Header ──────────────────────────────────────────────── -->
+  <header>
+    <div class="logo-icon">🎓</div>
+    <div>
+      <div class="logo-text">Waca</div>
+      <div class="logo-sub">UKDW's Personal Chatbot · Universitas Kristen Duta Wacana</div>
+    </div>
+    <div class="header-right">
+      <!-- Quota counter -->
+      <div class="quota-wrap" id="quotaWrap">
+        <div class="quota-label-row">
+          <span class="quota-icon">💬</span>
+          <span class="quota-badge quota-ok" id="quotaBadge">
+            <span class="quota-count" id="quotaCount">—</span>/<span id="quotaTotal">—</span> pertanyaan tersisa
+          </span>
+        </div>
+        <div class="quota-track">
+          <div class="quota-fill quota-ok" id="quotaBar" style="width:100%"></div>
+        </div>
+      </div>
+      <!-- Connection status -->
+      <div class="status-dot" id="statusDot"></div>
+      <span class="status-label" id="statusLabel">Connected</span>
+    </div>
+  </header>
+
+  <!-- ── Left Sidebar: Suggestions ───────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Quick Questions</div>
+
+    <button class="suggestion-btn"
+            onclick="sendSuggestion(this.dataset.msg)"
+            data-msg="Berapa biaya DPFP Informatika tahun 2025/2026?">
+      <span class="suggestion-icon">💰</span>
+      Biaya kuliah Informatika?
+    </button>
+
+    <button class="suggestion-btn"
+            onclick="sendSuggestion(this.dataset.msg)"
+            data-msg="Apa saja jalur pendaftaran mahasiswa baru UKDW?">
+      <span class="suggestion-icon">📋</span>
+      Jalur pendaftaran mahasiswa baru?
+    </button>
+
+    <button class="suggestion-btn"
+            onclick="sendSuggestion(this.dataset.msg)"
+            data-msg="Program studi apa yang ada di Fakultas Teknologi Informasi?">
+      <span class="suggestion-icon">⚙️</span>
+      Program Teknologi Informasi?
+    </button>
+
+    <button class="suggestion-btn"
+            onclick="sendSuggestion(this.dataset.msg)"
+            data-msg="Kapan jadwal pendaftaran mahasiswa baru dibuka?">
+      <span class="suggestion-icon">📅</span>
+      Jadwal pendaftaran PMB?
+    </button>
+
+    <button class="suggestion-btn"
+            onclick="sendSuggestion(this.dataset.msg)"
+            data-msg="Apa saja beasiswa yang tersedia untuk mahasiswa baru?">
+      <span class="suggestion-icon">🏅</span>
+      Beasiswa mahasiswa baru?
+    </button>
+
+    <button class="suggestion-btn"
+            onclick="sendSuggestion(this.dataset.msg)"
+            data-msg="Apa saja universitas mitra untuk student exchange UKDW?">
+      <span class="suggestion-icon">✈️</span>
+      Universitas mitra exchange?
+    </button>
+
+    <button class="suggestion-btn"
+            onclick="sendSuggestion(this.dataset.msg)"
+            data-msg="Berapa biaya SPP tetap Akuntansi per semester?">
+      <span class="suggestion-icon">💵</span>
+      SPP Akuntansi per semester?
+    </button>
+
+    <button class="suggestion-btn"
+            onclick="sendSuggestion(this.dataset.msg)"
+            data-msg="Bagaimana prosedur mendaftar melalui jalur Seleksi Prestasi?">
+      <span class="suggestion-icon">🎯</span>
+      Daftar jalur Prestasi?
+    </button>
+
+    <!-- Supported Intent Badges -->
+    <div class="sidebar-section">
+      <div class="sidebar-mini-title">Supported Intents</div>
+      <div>
+        <span class="intent-badge" style="background:#1a2d1a;color:#5dba6c;border:1px solid #2a4a2a">registration</span>
+        <span class="intent-badge" style="background:#1a1a2e;color:#7b9ef0;border:1px solid #2a2a4a">scholarship</span>
+        <span class="intent-badge" style="background:#2a1a10;color:#f09a50;border:1px solid #4a2a10">exchange</span>
+        <span class="intent-badge" style="background:#1e1a10;color:#d4b84a;border:1px solid #3a3010">fees</span>
+        <span class="intent-badge" style="background:#1a1a2e;color:#a08af0;border:1px solid #2a2a50">programs</span>
+        <span class="intent-badge" style="background:#1a2a2a;color:#50c8c8;border:1px solid #1a4a4a">calendar</span>
+        <span class="intent-badge" style="background:#2a1a2a;color:#d070d0;border:1px solid #4a1a4a">admission</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main Chat Area ───────────────────────────────────────── -->
+  <main class="chat-area">
+
+    <!-- Message History -->
+    <div class="messages" id="messages">
+
+      <!-- Welcome Screen (removed after first message) -->
+      <div class="welcome" id="welcomeScreen">
+        <div class="welcome-seal">🎓</div>
+        <h2>Halo! Saya Waca</h2>
+        <p>
+          Asisten chatbot pribadi UKDW — Universitas Kristen Duta Wacana.
+          Tanyakan apa saja tentang pendaftaran, beasiswa, program pertukaran,
+          biaya kuliah, atau jadwal akademik.
+        </p>
+        <div class="welcome-topics">
+          <span class="welcome-topic">📋 Pendaftaran</span>
+          <span class="welcome-topic">🏅 Beasiswa</span>
+          <span class="welcome-topic">✈️ Exchange Program</span>
+          <span class="welcome-topic">💰 Biaya Kuliah</span>
+          <span class="welcome-topic">📅 Kalender Akademik</span>
+          <span class="welcome-topic">⚙️ Program Studi</span>
+        </div>
+      </div>
+
+    </div><!-- /.messages -->
+
+    <!-- Text Input -->
+    <div class="input-area">
+      <div class="input-row">
+        <div class="input-wrap">
+          <textarea
+            id="msgInput"
+            placeholder="Tanyakan tentang pendaftaran, beasiswa, biaya kuliah, exchange program…"
+            rows="1"
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Kirim (Enter)">
+          ➤
+        </button>
+      </div>
+      <div class="input-hint">
+        Tekan <kbd>Enter</kbd> untuk kirim &nbsp;·&nbsp; <kbd>Shift+Enter</kbd> untuk baris baru
+      </div>
+    </div>
+
+  </main><!-- /.chat-area -->
+
+  <!-- ── Right Sidebar: Pipeline Panel ────────────────────────── -->
+  <aside class="pipeline-panel" id="pipelinePanel">
+    <div class="panel-title">Pipeline Status</div>
+
+    <!-- Step Indicators -->
+    <div class="pipeline-flow" id="pipelineFlow">
+
+      <div class="pipe-step">
+        <div class="pipe-step-header" id="step-m1">
+          <div class="pipe-num" id="num-m1">M1</div>
+          <div class="pipe-info">
+            <div class="pipe-name">Orchestration Layer</div>
+            <div class="pipe-label">Ollama · Intent + Entities</div>
+          </div>
+        </div>
+        <div class="pipe-connector" id="conn-m1"></div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-step-header" id="step-sql">
+          <div class="pipe-num" id="num-sql">SQL</div>
+          <div class="pipe-info">
+            <div class="pipe-name">Retrieval Layer</div>
+            <div class="pipe-label">PostgreSQL · Query Execution</div>
+          </div>
+        </div>
+        <div class="pipe-connector" id="conn-sql"></div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-step-header" id="step-res">
+          <div class="pipe-num" id="num-res">RES</div>
+          <div class="pipe-info">
+            <div class="pipe-name">Response Layer</div>
+            <div class="pipe-label">Ollama · NL Generation</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /#pipelineFlow -->
+
+    <!-- Detail Blocks (populated dynamically by app.js) -->
+    <div id="intentDetail" style="display:none">
+      <div class="detail-block">
+        <div class="detail-block-header">Extracted Intent &amp; Entities</div>
+        <div class="detail-block-body" id="intentBody"></div>
+      </div>
+    </div>
+
+    <div id="sqlDetail" style="display:none">
+      <div class="detail-block">
+        <div class="detail-block-header">SQL Query</div>
+        <div class="detail-block-body"
+             id="sqlBody"
+             style="font-size:10.5px;white-space:pre-wrap;color:#a8c4e8;line-height:1.6">
+        </div>
+      </div>
+    </div>
+
+    <div id="dataDetail" style="display:none">
+      <div class="detail-block">
+        <div class="detail-block-header">Retrieved Data</div>
+        <div class="detail-block-body" id="dataBody"></div>
+      </div>
+    </div>
+
+    <!-- Stack Info (static) -->
+    <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--navy-border)">
+      <div class="detail-block">
+        <div class="detail-block-header">Stack</div>
+        <div class="detail-block-body">
+          <div class="key-val">
+            <span class="kv-key">LLM</span>
+            <span class="kv-val">Ollama / gemma4</span>
+          </div>
+          <div class="key-val">
+            <span class="kv-key">DB</span>
+            <span class="kv-val">PostgreSQL</span>
+          </div>
+          <div class="key-val">
+            <span class="kv-key">API</span>
+            <span class="kv-val">FastAPI</span>
+          </div>
+          <div class="key-val">
+            <span class="kv-key">System</span>
+            <span class="kv-val">Waca · UKDW</span>
+          </div>
+          <div class="key-val">
+            <span class="kv-key">Mode</span>
+            <span class="kv-val" id="modeLabel">Live</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </aside><!-- /.pipeline-panel -->
+
+</div><!-- /.app -->
+
+<!-- JavaScript (at end of body so DOM is available when it executes) -->
+<script src="/ui/app.js?v=2"></script>
+
+</body>
+</html>
